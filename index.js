@@ -11,8 +11,7 @@ const galleryMarkup = createGalleryMarkup(galleryItems);
 gallery.innerHTML = galleryMarkup;
 
 gallery.addEventListener("click", toOpenOriginalImageInModal);
-closeModalBtn.addEventListener("click", toCloseModalWithImage);
-lightboxOverlay.addEventListener("click", toCloseModalWithImage);
+lightbox.addEventListener("click", toCloseModalWithImage);
 window.addEventListener("keyup", toCloseModalByEscape);
 window.addEventListener("keyup", toGoToTheNextPicture);
 window.addEventListener("keyup", toGoToThePreviousPicture);
@@ -46,66 +45,58 @@ function toOpenOriginalImageInModal(evt) {
   lightboxImage.alt = evt.target.alt;
 }
 
-function toCloseModalWithImage() {
+function toCloseModalWithImage(evt) {
+  if (evt.target !== closeModalBtn && evt.target !== lightboxOverlay) {
+    return;
+  }
   lightbox.classList.remove("is-open");
   lightboxImage.src = "";
   lightboxImage.alt = "";
 }
 
 function toCloseModalByEscape(key) {
-  if (key.code === "Escape") {
-    toCloseModalWithImage();
-  } else return;
+  if (key.code !== "Escape") {
+    return;
+  }
+  lightbox.classList.remove("is-open");
+  lightboxImage.src = "";
+  lightboxImage.alt = "";
 }
 
 function toGoToTheNextPicture(key) {
   if (key.code !== "ArrowRight") {
     return;
-  } else {
-    const currentImageInGallery = galleryItems.find(
-      (item) => item.description === lightboxImage.alt
-    );
-    const indexOfCurrentImageInGallery = galleryItems.indexOf(
-      currentImageInGallery
-    );
-    const indexOfNextImageInGallery = indexOfCurrentImageInGallery + 1;
-    const nextImage = galleryItems[indexOfNextImageInGallery];
-    const firstImage = galleryItems[0];
+  }
 
-    if (indexOfCurrentImageInGallery !== galleryItems.length - 1) {
-      lightboxImage.src = nextImage.original;
-      lightboxImage.alt = nextImage.description;
-      return;
-    } else {
-      lightboxImage.src = firstImage.original;
-      lightboxImage.alt = firstImage.description;
-      return;
-    }
+  const indexOfCurrentImageInGallery = galleryItems.indexOf(
+    galleryItems.find((item) => item.description === lightboxImage.alt)
+  );
+
+  if (indexOfCurrentImageInGallery !== galleryItems.length - 1) {
+    lightboxImage.src = galleryItems[indexOfCurrentImageInGallery + 1].original;
+    lightboxImage.alt =
+      galleryItems[indexOfCurrentImageInGallery + 1].description;
+  } else {
+    lightboxImage.src = galleryItems[0].original;
+    lightboxImage.alt = galleryItems[0].description;
   }
 }
 
 function toGoToThePreviousPicture(key) {
   if (key.code !== "ArrowLeft") {
     return;
-  } else {
-    const currentImageInGallery = galleryItems.find(
-      (item) => item.description === lightboxImage.alt
-    );
-    const indexOfCurrentImageInGallery = galleryItems.indexOf(
-      currentImageInGallery
-    );
-    const indexOfPreviousImageInGallery = indexOfCurrentImageInGallery - 1;
-    const previousImage = galleryItems[indexOfPreviousImageInGallery];
-    const lastImage = galleryItems[galleryItems.length - 1];
+  }
 
-    if (indexOfCurrentImageInGallery !== 0) {
-      lightboxImage.src = previousImage.original;
-      lightboxImage.alt = previousImage.description;
-      return;
-    } else {
-      lightboxImage.src = lastImage.original;
-      lightboxImage.alt = lastImage.description;
-      return;
-    }
+  const indexOfCurrentImageInGallery = galleryItems.indexOf(
+    galleryItems.find((item) => item.description === lightboxImage.alt)
+  );
+
+  if (indexOfCurrentImageInGallery !== 0) {
+    lightboxImage.src = galleryItems[indexOfCurrentImageInGallery - 1].original;
+    lightboxImage.alt =
+      galleryItems[indexOfCurrentImageInGallery - 1].description;
+  } else {
+    lightboxImage.src = galleryItems[galleryItems.length - 1].original;
+    lightboxImage.alt = galleryItems[galleryItems.length - 1].description;
   }
 }
